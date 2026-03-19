@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import ItemTypeBadge from "@/components/catalog/ItemTypeBadge";
+import SourcingBadge from "@/components/catalog/SourcingBadge";
 import EmptyState from "@/components/shared/EmptyState";
 import CatalogFormDialog from "@/components/catalog/CatalogFormDialog";
 import CatalogFilters from "@/components/catalog/CatalogFilters";

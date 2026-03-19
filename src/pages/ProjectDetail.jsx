@@ -11,6 +11,8 @@ import EmptyState from "@/components/shared/EmptyState";
 import AddLineItemDialog from "@/components/projects/AddLineItemDialog";
 import ProjectFormDialog from "@/components/projects/ProjectFormDialog";
 import ProjectSummary from "@/components/projects/ProjectSummary";
+import SiteServiceabilityPanel from "@/components/projects/SiteServiceabilityPanel";
+import MigrationTracker from "@/components/projects/MigrationTracker";
 
 const statusStyles = {
   Lead: "bg-muted text-muted-foreground",
