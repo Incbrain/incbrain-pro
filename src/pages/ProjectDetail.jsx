@@ -97,7 +97,14 @@ export default function ProjectDetail() {
         </Button>
       </div>
 
-      <ProjectSummary lineItems={lineItems} catalogMap={catalogMap} markup={markup} />
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2">
+          <ProjectSummary lineItems={lineItems} catalogMap={catalogMap} markup={markup} />
+        </div>
+        <SiteServiceabilityPanel project={project} />
+      </div>
+
+      <MigrationTracker lineItems={lineItems} catalogMap={catalogMap} />
 
       <div className="bg-card rounded-xl border border-border overflow-hidden">
         <div className="px-5 py-4 border-b border-border">

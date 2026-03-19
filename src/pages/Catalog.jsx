@@ -141,7 +141,14 @@ export default function Catalog() {
                             </div>
                           </div>
                         </TableCell>
-                        <TableCell><ItemTypeBadge category={item.category} /></TableCell>
+                        <TableCell>
+                            <div className="flex flex-col gap-1">
+                              <ItemTypeBadge category={item.category} />
+                              {item.sourcing_model && item.sourcing_model !== "Incbrain-Direct" && (
+                                <SourcingBadge model={item.sourcing_model} />
+                              )}
+                            </div>
+                          </TableCell>
                         <TableCell className="text-sm text-muted-foreground">{item.vendor || "—"}</TableCell>
                         <TableCell className="text-sm text-muted-foreground">{item.unit_of_measure || "Each"}</TableCell>
                         <TableCell className="text-right text-sm">${(item.wholesale_cost || 0).toFixed(2)}</TableCell>
