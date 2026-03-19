@@ -76,28 +76,30 @@ export default function ProjectDetail() {
 
   return (
     <div className="p-6 lg:p-8 max-w-6xl mx-auto space-y-6">
-      <div className="flex items-center gap-3">
-        <Button variant="ghost" size="icon" onClick={() => navigate("/Projects")}>
+      <div className="flex items-start gap-3">
+        <Button variant="ghost" size="icon" className="mt-0.5 shrink-0" onClick={() => navigate("/Projects")}>
           <ArrowLeft className="w-4 h-4" />
         </Button>
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-bold tracking-tight truncate">{project.client_name}</h1>
+          <div className="flex items-center gap-2 flex-wrap">
+            <h1 className="text-xl sm:text-2xl font-bold tracking-tight truncate">{project.client_name}</h1>
             <Badge className={statusStyles[project.project_status] || statusStyles.Lead}>
               {project.project_status || "Lead"}
             </Badge>
           </div>
           <p className="text-sm text-muted-foreground mt-0.5">Markup: {markup}%</p>
         </div>
-        <Button variant="outline" className="gap-2" onClick={() => setEditOpen(true)}>
-          <Pencil className="w-4 h-4" /> Edit
-        </Button>
-        <Button className="gap-2" onClick={() => setAddOpen(true)}>
-          <Plus className="w-4 h-4" /> Add Item
-        </Button>
+        <div className="flex gap-2 shrink-0">
+          <Button variant="outline" size="icon" onClick={() => setEditOpen(true)}>
+            <Pencil className="w-4 h-4" />
+          </Button>
+          <Button className="gap-2" onClick={() => setAddOpen(true)}>
+            <Plus className="w-4 h-4" /> <span className="hidden sm:inline">Add Item</span>
+          </Button>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="lg:col-span-2">
           <ProjectSummary lineItems={lineItems} catalogMap={catalogMap} markup={markup} />
         </div>
