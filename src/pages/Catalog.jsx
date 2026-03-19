@@ -87,7 +87,7 @@ export default function Catalog() {
         />
       </div>
 
-      <div className="flex gap-6 items-start">
+      <div className="flex flex-col lg:flex-row gap-6 items-start">
         <CatalogFilters items={items} filters={filters} onChange={setFilters} />
 
         <div className="flex-1 min-w-0 bg-card rounded-xl border border-border overflow-hidden">
@@ -100,48 +100,85 @@ export default function Catalog() {
               onAction={() => { setEditingItem(null); setDialogOpen(true); }}
             />
           ) : (
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow className="bg-muted/50">
-                    <TableHead>Item</TableHead>
-                    <TableHead>Type</TableHead>
-                    <TableHead>Vendor</TableHead>
-                    <TableHead>UOM</TableHead>
-                    <TableHead className="text-right">Cost</TableHead>
-                    <TableHead className="text-right">Sell</TableHead>
-                    <TableHead className="text-right">Margin</TableHead>
-                    <TableHead className="w-20"></TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filtered.map((item) => {
-                    const margin = (item.retail_price || 0) - (item.wholesale_cost || 0);
-                    const marginPct = item.retail_price > 0 ? ((margin / item.retail_price) * 100).toFixed(0) : 0;
-                    return (
-                      <TableRow
-                        key={item.id}
-                        className="hover:bg-muted/30 cursor-pointer"
-                        onClick={() => setDetailItem(item)}
-                      >
-                        <TableCell>
-                          <div className="flex items-center gap-3">
-                            {item.image_url ? (
-                              <img src={item.image_url} alt="" className="w-8 h-8 rounded-md object-contain bg-muted border border-border shrink-0" />
-                            ) : (
-                              <div className="w-8 h-8 rounded-md bg-muted border border-border flex items-center justify-center shrink-0">
-                                <Package className="w-4 h-4 text-muted-foreground" />
+            <>
+              {/* Mobile card list */}
+              <div className="divide-y divide-border md:hidden">
+                {filtered.map((item) => {
+                  const margin = (item.retail_price || 0) - (item.wholesale_cost || 0);
+                  const marginPct = item.retail_price > 0 ? ((margin / item.retail_price) * 100).toFixed(0) : 0;
+                  return (
+                    <div key={item.id} className="px-4 py-4 flex items-center gap-3 cursor-pointer hover:bg-muted/30" onClick={() => setDetailItem(item)}>
+                      {item.image_url ? (
+                        <img src={item.image_url} alt="" className="w-10 h-10 rounded-md object-contain bg-muted border border-border shrink-0" />
+                      ) : (
+                        <div className="w-10 h-10 rounded-md bg-muted border border-border flex items-center justify-center shrink-0">
+                          <Package className="w-5 h-5 text-muted-foreground" />
+                        </div>
+                      )}
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium text-sm truncate">{item.item_name}</p>
+                        <p className="text-xs text-muted-foreground font-mono truncate">{item.sku}{item.vendor ? ` · ${item.vendor}` : ""}</p>
+                        <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
+                          <ItemTypeBadge category={item.category} />
+                          {item.sourcing_model && item.sourcing_model !== "Incbrain-Direct" && (
+                            <SourcingBadge model={item.sourcing_model} />
+                          )}
+                        </div>
+                      </div>
+                      <div className="text-right shrink-0">
+                        <p className="text-sm font-semibold">${(item.retail_price || 0).toFixed(2)}</p>
+                        <p className="text-xs text-emerald-600 font-medium">{marginPct}% margin</p>
+                        <div className="flex gap-1 justify-end mt-1.5" onClick={(e) => e.stopPropagation()}>
+                          <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => { setEditingItem(item); setDialogOpen(true); }}>
+                            <Pencil className="w-3 h-3" />
+                          </Button>
+                          <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive" onClick={() => deleteMut.mutate(item.id)}>
+                            <Trash2 className="w-3 h-3" />
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Desktop table */}
+              <div className="hidden md:block overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow className="bg-muted/50">
+                      <TableHead>Item</TableHead>
+                      <TableHead>Type</TableHead>
+                      <TableHead>Vendor</TableHead>
+                      <TableHead>UOM</TableHead>
+                      <TableHead className="text-right">Cost</TableHead>
+                      <TableHead className="text-right">Sell</TableHead>
+                      <TableHead className="text-right">Margin</TableHead>
+                      <TableHead className="w-20"></TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {filtered.map((item) => {
+                      const margin = (item.retail_price || 0) - (item.wholesale_cost || 0);
+                      const marginPct = item.retail_price > 0 ? ((margin / item.retail_price) * 100).toFixed(0) : 0;
+                      return (
+                        <TableRow key={item.id} className="hover:bg-muted/30 cursor-pointer" onClick={() => setDetailItem(item)}>
+                          <TableCell>
+                            <div className="flex items-center gap-3">
+                              {item.image_url ? (
+                                <img src={item.image_url} alt="" className="w-8 h-8 rounded-md object-contain bg-muted border border-border shrink-0" />
+                              ) : (
+                                <div className="w-8 h-8 rounded-md bg-muted border border-border flex items-center justify-center shrink-0">
+                                  <Package className="w-4 h-4 text-muted-foreground" />
+                                </div>
+                              )}
+                              <div>
+                                <p className="font-medium text-sm">{item.item_name}</p>
+                                <p className="text-xs text-muted-foreground font-mono">{item.sku}{item.mpn ? ` · ${item.mpn}` : ""}</p>
                               </div>
-                            )}
-                            <div>
-                              <p className="font-medium text-sm">{item.item_name}</p>
-                              <p className="text-xs text-muted-foreground font-mono">
-                                {item.sku}{item.mpn ? ` · ${item.mpn}` : ""}
-                              </p>
                             </div>
-                          </div>
-                        </TableCell>
-                        <TableCell>
+                          </TableCell>
+                          <TableCell>
                             <div className="flex flex-col gap-1">
                               <ItemTypeBadge category={item.category} />
                               {item.sourcing_model && item.sourcing_model !== "Incbrain-Direct" && (
@@ -149,29 +186,28 @@ export default function Catalog() {
                               )}
                             </div>
                           </TableCell>
-                        <TableCell className="text-sm text-muted-foreground">{item.vendor || "—"}</TableCell>
-                        <TableCell className="text-sm text-muted-foreground">{item.unit_of_measure || "Each"}</TableCell>
-                        <TableCell className="text-right text-sm">${(item.wholesale_cost || 0).toFixed(2)}</TableCell>
-                        <TableCell className="text-right text-sm font-medium">${(item.retail_price || 0).toFixed(2)}</TableCell>
-                        <TableCell className="text-right">
-                          <span className="text-emerald-600 font-semibold text-sm">{marginPct}%</span>
-                        </TableCell>
-                        <TableCell onClick={(e) => e.stopPropagation()}>
-                          <div className="flex gap-1 justify-end">
-                            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => { setEditingItem(item); setDialogOpen(true); }}>
-                              <Pencil className="w-3.5 h-3.5" />
-                            </Button>
-                            <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:text-destructive" onClick={() => deleteMut.mutate(item.id)}>
-                              <Trash2 className="w-3.5 h-3.5" />
-                            </Button>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    );
-                  })}
-                </TableBody>
-              </Table>
-            </div>
+                          <TableCell className="text-sm text-muted-foreground">{item.vendor || "—"}</TableCell>
+                          <TableCell className="text-sm text-muted-foreground">{item.unit_of_measure || "Each"}</TableCell>
+                          <TableCell className="text-right text-sm">${(item.wholesale_cost || 0).toFixed(2)}</TableCell>
+                          <TableCell className="text-right text-sm font-medium">${(item.retail_price || 0).toFixed(2)}</TableCell>
+                          <TableCell className="text-right"><span className="text-emerald-600 font-semibold text-sm">{marginPct}%</span></TableCell>
+                          <TableCell onClick={(e) => e.stopPropagation()}>
+                            <div className="flex gap-1 justify-end">
+                              <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => { setEditingItem(item); setDialogOpen(true); }}>
+                                <Pencil className="w-3.5 h-3.5" />
+                              </Button>
+                              <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:text-destructive" onClick={() => deleteMut.mutate(item.id)}>
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </Button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
+                  </TableBody>
+                </Table>
+              </div>
+            </>
           )}
         </div>
       </div>

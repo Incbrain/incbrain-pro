@@ -113,58 +113,94 @@ export default function ProjectDetail() {
         {lineItems.length === 0 ? (
           <EmptyState icon={FileText} title="No line items" description="Add catalog items to this estimate." actionLabel="Add Item" onAction={() => setAddOpen(true)} />
         ) : (
-          <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow className="bg-muted/50">
-                  <TableHead>Item</TableHead>
-                  <TableHead>Category</TableHead>
-                  <TableHead className="text-right">Wholesale</TableHead>
-                  <TableHead className="text-right">Unit Price</TableHead>
-                  <TableHead className="text-right">w/ Markup</TableHead>
-                  <TableHead className="text-right">Qty</TableHead>
-                  <TableHead className="text-right">Subtotal</TableHead>
-                  <TableHead className="text-right">Margin</TableHead>
-                  <TableHead className="w-12"></TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {lineItems.map((li) => {
-                  const cat = catalogMap[li.catalog_item_id];
-                  if (!cat) return null;
-                  const price = li.override_price != null ? li.override_price : cat.retail_price;
-                  const markedUpPrice = price * (1 + markup / 100);
-                  const subtotal = markedUpPrice * li.quantity;
-                  const cost = cat.wholesale_cost * li.quantity;
-                  const margin = subtotal - cost;
-                  return (
-                    <TableRow key={li.id}>
-                      <TableCell>
-                        <div>
-                          <p className="font-medium text-sm">{cat.item_name}</p>
-                          {li.override_price != null && (
-                            <p className="text-xs text-amber-600">Override price applied</p>
-                          )}
-                        </div>
-                      </TableCell>
-                      <TableCell><CategoryBadge category={cat.category} /></TableCell>
-                      <TableCell className="text-right text-muted-foreground">${cat.wholesale_cost?.toFixed(2)}</TableCell>
-                      <TableCell className="text-right">${price.toFixed(2)}</TableCell>
-                      <TableCell className="text-right font-medium">${markedUpPrice.toFixed(2)}</TableCell>
-                      <TableCell className="text-right">{li.quantity}</TableCell>
-                      <TableCell className="text-right font-semibold">${subtotal.toFixed(2)}</TableCell>
-                      <TableCell className="text-right text-emerald-600 font-medium">${margin.toFixed(2)}</TableCell>
-                      <TableCell>
-                        <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => deleteLineItemMut.mutate(li.id)}>
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  );
-                })}
-              </TableBody>
-            </Table>
-          </div>
+          <>
+            {/* Mobile card list */}
+            <div className="divide-y divide-border md:hidden">
+              {lineItems.map((li) => {
+                const cat = catalogMap[li.catalog_item_id];
+                if (!cat) return null;
+                const price = li.override_price != null ? li.override_price : cat.retail_price;
+                const markedUpPrice = price * (1 + markup / 100);
+                const subtotal = markedUpPrice * li.quantity;
+                const cost = cat.wholesale_cost * li.quantity;
+                const margin = subtotal - cost;
+                return (
+                  <div key={li.id} className="px-4 py-4 flex items-start justify-between gap-3">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <CategoryBadge category={cat.category} />
+                        {li.override_price != null && <span className="text-xs text-amber-600">Override</span>}
+                      </div>
+                      <p className="font-medium text-sm truncate">{cat.item_name}</p>
+                      <div className="flex flex-wrap gap-x-4 gap-y-0.5 mt-1.5 text-xs text-muted-foreground">
+                        <span>Qty: <span className="font-medium text-foreground">{li.quantity}</span></span>
+                        <span>Unit: <span className="font-medium text-foreground">${markedUpPrice.toFixed(2)}</span></span>
+                        <span className="text-emerald-600 font-medium">Margin: ${margin.toFixed(2)}</span>
+                      </div>
+                    </div>
+                    <div className="text-right shrink-0">
+                      <p className="text-sm font-bold">${subtotal.toFixed(2)}</p>
+                      <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive mt-1" onClick={() => deleteLineItemMut.mutate(li.id)}>
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </Button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Desktop table */}
+            <div className="hidden md:block overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow className="bg-muted/50">
+                    <TableHead>Item</TableHead>
+                    <TableHead>Category</TableHead>
+                    <TableHead className="text-right">Wholesale</TableHead>
+                    <TableHead className="text-right">Unit Price</TableHead>
+                    <TableHead className="text-right">w/ Markup</TableHead>
+                    <TableHead className="text-right">Qty</TableHead>
+                    <TableHead className="text-right">Subtotal</TableHead>
+                    <TableHead className="text-right">Margin</TableHead>
+                    <TableHead className="w-12"></TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {lineItems.map((li) => {
+                    const cat = catalogMap[li.catalog_item_id];
+                    if (!cat) return null;
+                    const price = li.override_price != null ? li.override_price : cat.retail_price;
+                    const markedUpPrice = price * (1 + markup / 100);
+                    const subtotal = markedUpPrice * li.quantity;
+                    const cost = cat.wholesale_cost * li.quantity;
+                    const margin = subtotal - cost;
+                    return (
+                      <TableRow key={li.id}>
+                        <TableCell>
+                          <div>
+                            <p className="font-medium text-sm">{cat.item_name}</p>
+                            {li.override_price != null && <p className="text-xs text-amber-600">Override price applied</p>}
+                          </div>
+                        </TableCell>
+                        <TableCell><CategoryBadge category={cat.category} /></TableCell>
+                        <TableCell className="text-right text-muted-foreground">${cat.wholesale_cost?.toFixed(2)}</TableCell>
+                        <TableCell className="text-right">${price.toFixed(2)}</TableCell>
+                        <TableCell className="text-right font-medium">${markedUpPrice.toFixed(2)}</TableCell>
+                        <TableCell className="text-right">{li.quantity}</TableCell>
+                        <TableCell className="text-right font-semibold">${subtotal.toFixed(2)}</TableCell>
+                        <TableCell className="text-right text-emerald-600 font-medium">${margin.toFixed(2)}</TableCell>
+                        <TableCell>
+                          <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => deleteLineItemMut.mutate(li.id)}>
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            </div>
+          </>
         )}
       </div>
 
